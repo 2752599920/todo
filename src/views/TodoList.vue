@@ -1,79 +1,64 @@
 <template>
-  <div class="home">
-    <!-- todo应用的头部 -->
-    <van-tabs  ref="tab" v-model="active" swipeable :color="theme" background >
-      <van-tab v-for="(item ,index) in tab" :key="index" :title="item">
-        <van-empty v-show="show"
+  <div class="TodoList">
+    <h1>Plan a <span style="color:#83dfcf"> Happy life </span> today...</h1>
+    <van-empty v-show="show"
                 class="custom-image"
                 image="https://img.yzcdn.cn/vant/custom-empty-image.png"
                 description="没有啦"
               />
-        <div class="todoList">
+        <div class="todoList" >
           <div class="listLeft listBox">
-            <div  v-for="(item,i) in todos" :key="i" v-show="i%2==0 && item.index==active && $store.state.curdate == item.date" :class="item.stutas==1?'todoItem complete':'todoItem'">
-              <!-- 便签头部 start -->
-              <div class="itemTop">
-                  <!-- 便签按钮 -->
-                  <span class="ckBtn">
-                    <!-- 标记已完成任务的按按钮  -->
-                    <van-checkbox v-model="item.stutas" :checked-color="theme" @click="edit()"></van-checkbox>
-                    <!-- 删除便签按钮 -->
-                    <span class="del"><van-icon name="clear" size="22" @click="del(i)"></van-icon></span>
-                  </span>
-                  <!-- 便签任务 title -->
-                  <span class="mission" v-text="item.mission"></span>
-              </div>
-              <!-- 便签头部 end -->
-              <!-- 便签内容 article -->
-              <div class="itemBottom">
-                <!-- 便签任务描述 -->
-                <p class="message" v-text="item.message"></p>
-                <!-- 便签日期 -->
-                <span class="dateFix">
-                    <!-- 具体日期 -->
-                    <span class="date overflow-ellipsis" v-text="item.date"></span> <br>
-                    <!-- 判断星期一至星期日 -->
-                    <span class="day overflow-ellipsis" v-text="(`${item.date}(${item.day})`)==today?`今天`:`${item.day}`"></span>                </span>
+            <div class="f-box" v-for="(items , sqlIndex) in sql" :key='sqlIndex'>
+              <div  v-for="(item,i) in items.todolist" :key="i" v-show="sqlIndex%2==0" :class="item.stutas==1?'todoItem complete':'todoItem'">
+                <!-- 便签的头部 -->
+                <div :class="`itemTop add${sqlIndex}`" >
+                    <span class="ckBtn">
+                      <van-checkbox v-model="item.stutas" :checked-color="theme" @click="edit()"></van-checkbox>
+                      <span class="del"><van-icon name="clear" size="22" @click="del(sqlIndex,i)"></van-icon></span>
+                    </span>
+                    <span class="mission" v-text="item.mission"></span>
+                </div>
+                <div class="itemBottom">
+                  <p class="message" v-text="item.message"></p>
+                  <span class="dateFix">
+                      <span class="date overflow-ellipsis" v-text="item.date"></span> <br>
+                      <span class="day overflow-ellipsis" v-text="(`${item.date}(${item.day})`)==today?`今天`:`${item.day}`"></span>                </span>
+                </div>
               </div>
             </div>
           </div>
-          <div class="listRight listBox">
-            <div v-for="(item,i) in todos" :key="i" v-show="i%2==1 && item.index==active && $store.state.curdate == item.date"  :class="item.stutas==1?'todoItem complete':'todoItem'">
-              <div class="itemTop">
-                  <span class="ckBtn">
-                    <van-checkbox v-model="item.stutas" :checked-color="theme" @click="edit()"></van-checkbox>
-                    <span class="del"><van-icon name="clear" size="22"  @click="del(i)"></van-icon></span>
+          <div class="listRight listBox" >
+            <div class="f-box" v-for="(items , sqlIndex) in sql" :key='sqlIndex'>
+              <div v-for="(item,i) in items.todolist" :key="i" v-show="sqlIndex%2==1"  :class="item.stutas==1?'todoItem complete':'todoItem'">
+                <div :class="`itemTop add${sqlIndex}`">
+                    <span class="ckBtn">
+                      <van-checkbox v-model="item.stutas" :checked-color="theme" @click="edit()"></van-checkbox>
+                      <span class="del"><van-icon name="clear" size="22"  @click="del(sqlIndex,i)"></van-icon></span>
+                    </span>
+                    <span class="mission" v-text="item.mission"></span>
+                </div>
+                <div class="itemBottom">
+                  <p class="message" v-text="item.message"></p>
+                  <span class="dateFix">
+                      <span class="date overflow-ellipsis" v-text="item.date"></span> <br>
+                      <span class="day overflow-ellipsis" v-text="(`${item.date}(${item.day})`)==today?`今天`:`${item.day}`"></span>
                   </span>
-                  <span class="mission" v-text="item.mission"></span>
-              </div>
-              <div class="itemBottom">
-                <p class="message" v-text="item.message"></p>
-                <span class="dateFix">
-                    <span class="date overflow-ellipsis" v-text="item.date"></span> <br>
-                    <span class="day overflow-ellipsis" v-text="(`${item.date}(${item.day})`)==today?`今天`:`${item.day}`"></span>
-                </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </van-tab>
-    </van-tabs>
-    <router-link :class="['add',add]" to="/AddTODO">+</router-link>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 export default {
-  name: "Home",
+  name: "TodoList",
   data() {
     return {
       tab:['重要 紧急','重要 不紧急','不重要 紧急','不重要 不紧急'],
-      active:0,
       theme:'red',
-      add:'add0',
-      page:'page0',
-      todos:[],
       sql:[],
       show:true,
       today:this.formatDate(new Date()),
@@ -81,7 +66,11 @@ export default {
       nextWeek:this.formatDate(new Date(),7),
     };
   },
+  created(){
+      this.$store.state.vanTabbar = false
+  },
   mounted(){
+      this.$store.state.vanTabbar = false
     if(localStorage.getItem('todos')!=null){
       this.getTodo();
     }
@@ -101,23 +90,21 @@ export default {
       this.sql = JSON.parse(localStorage.getItem('todos'));
       if(this.sql){
         this.sql.map((item)=>{
-          if(item.index == this.active){
-            this.todos = item.todolist;
-          }
+            this.show=item.todolist.length>0 ? false:null;
         })
-        this.show=this.sql[this.active].todolist.length>0 ? false:true;
       }
     },
     edit(){
       this.save();
     },
-    del(i){
+    del(sqlIndex,i){
+      console.log(sqlIndex,i);
       this.$dialog.confirm({
         title: '提示',
         message: '是否确认删除？',
       })
         .then(() => {
-          this.sql[this.active].todolist.splice(i,1);
+          this.sql[sqlIndex].todolist.splice(i,1);
           this.save();
           this.$toast.success('删除成功');
         })
@@ -129,44 +116,21 @@ export default {
       localStorage.setItem('todos',JSON.stringify(this.sql));
     }
   },
+  destroyed(){
+    this.$store.state.vanTabbar = true
+  },
   watch:{
-    'active':function(){
-      if(this.active==0){
-        this.theme = "red"
-      }else if(this.active==1){
-        this.theme = "rgba(255, 166, 0, 0.7)"
-      }else if(this.active==2){
-        this.theme = "dodgerblue"
-      }else if(this.active==3){
-        this.theme = "#83dfcf"
-      }
-        this.add =`add${this.active}`
-        this.page = `page${this.active}`
-        this.getTodo();
-    }
   }
 };
 </script>
 <style lang="scss">
-  .home {
+  .TodoList {
+    transform: translateY(-20px);
     h1 {
       text-align: center;
     }
     .van-tab__text{
       font-size: 14px;
-    }
-    .add{
-      position: fixed;
-      bottom: 70px;
-      right:10px;
-      width: 40px;
-      height: 40px;
-      text-align: center;
-      line-height: 40px;
-      font-size: 40px;
-      color: white;
-      font-weight: 700;
-      border-radius: 50%;
     }
     .add0{
       background: rgba(255, 0, 0, 0.445);
@@ -182,7 +146,7 @@ export default {
     }
 
     .todoList{
-      width: 90vw;
+      width: 94vw;
       margin: 20px auto;
       display: flex;
       justify-content: space-evenly;
@@ -190,6 +154,12 @@ export default {
         width: 50%;
         display: flex;
         flex-direction: column;
+        .f-box{
+          display: flex;
+          flex-direction: column;
+          margin: 0;
+          padding: 0;
+        }
         .todoItem{
           width: 94%;
           border-radius: 10px;
@@ -198,16 +168,16 @@ export default {
           margin: 10px auto;
           box-shadow: 3px 3px 9px #d9d9d9,
                       -3px -3px 9px #fff;
+          overflow: hidden;
           .itemTop{
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #2a9d8f;
             color: white;
             .mission{
               display: inline-block;
               box-sizing:border-box;
-              padding: 0px 10px 5px 16px;
+              padding: 0px 10px 5px 14px;
               font-size: 18px;
               letter-spacing: 3px;
               font-weight: 500;
@@ -234,7 +204,8 @@ export default {
                   line-height: 20px;
                   font-size: 12px;
                   border-radius: 50%;
-                  color: #e9c46a;
+                  // color: #e9c46a;
+                  color: #fff;
                 }
               }
             }
@@ -247,7 +218,7 @@ export default {
             .message{
               width: 90%;
               overflow: hidden;
-              word-break: break-all;
+              word-break:break-all;
               margin: 10px auto;
               line-height: 20px;
             }
@@ -294,5 +265,4 @@ export default {
       text-overflow: ellipsis;
     }
   }
-  
 </style>
