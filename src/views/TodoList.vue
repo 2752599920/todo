@@ -70,7 +70,6 @@ export default {
       this.$store.state.vanTabbar = false
   },
   mounted(){
-      this.$store.state.vanTabbar = false
     if(this.$ls.get('todos')!=null){
       this.getTodo();
     }
@@ -88,10 +87,17 @@ export default {
     },
     getTodo(){
       this.sql = JSON.parse(this.$ls.get('todos'));
+      let S = 0;
       if(this.sql){
         this.sql.map((item)=>{
-            this.show=item.todolist.length>0 ? false:null;
+          item.todolist.length>0 ? S=S+1:S;
         })
+      }
+      console.log(S);
+      if(S == 0){
+        this.show=true
+      }else{
+        this.show=false
       }
     },
     edit(){
@@ -107,6 +113,8 @@ export default {
           this.sql[sqlIndex].todolist.splice(i,1);
           this.save();
           this.$toast.success('删除成功');
+          this.getTodo();
+
         })
         .catch(() => {
           // this.$toast.success('取消成功');
