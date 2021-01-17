@@ -93,7 +93,7 @@ export default {
           item.todolist.length>0 ? S=S+1:S;
         })
       }
-      console.log(S);
+      // console.log(S);
       if(S == 0){
         this.show=true
       }else{
