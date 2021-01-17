@@ -81,8 +81,11 @@ export default {
       nextWeek:this.formatDate(new Date(),7),
     };
   },
+  created(){
+    this.$store.state.vanTabbar = true
+  },
   mounted(){
-    if(localStorage.getItem('todos')!=null){
+    if(this.$ls.get('todos')!=null){
       this.getTodo();
     }
   },
@@ -98,7 +101,7 @@ export default {
       return `${yy}/${mm}/${dd}(${arr_week[date.getDay()]})`;
     },
     getTodo(){
-      this.sql = JSON.parse(localStorage.getItem('todos'));
+      this.sql = JSON.parse(this.$ls.get('todos'));
       if(this.sql){
         this.sql.map((item)=>{
           if(item.index == this.active){
@@ -126,7 +129,7 @@ export default {
         });
     },
     save(){
-      localStorage.setItem('todos',JSON.stringify(this.sql));
+      this.$ls.set('todos',JSON.stringify(this.sql));
     }
   },
   watch:{

@@ -86,11 +86,11 @@ export default {
           };
         let todos = new Array();
         let sql = [];
-        if(localStorage.todos!=null){
-          sql = localStorage.getItem('todos');
+        if(this.$ls.get('todos')!=null){
+          sql = this.$ls.get('todos');
           sql = JSON.parse(sql);
           sql[this.radio].todolist.unshift(todo);
-          todos = JSON.stringify(sql);
+          // todos = JSON.stringify(sql);
         }else{
           // 当本地存储没有数据的时候,初始化数据
           for(let i=0;i<=3;i++){
@@ -101,9 +101,10 @@ export default {
             sql.push(item);
           }
           sql[this.radio].todolist.unshift(todo);
-          todos = JSON.stringify(sql);
+          // todos = JSON.stringify(sql);
         }
-        localStorage.setItem('todos',todos)
+        todos = JSON.stringify(sql);
+        this.$ls.set('todos',todos)
         this.$toast.success('Add Success!');
         this.mission = null;
         this.message = null;
@@ -129,7 +130,7 @@ export default {
     },
   },
   destroyed(){
-    this.$store.state.vanTabbar = true
+    // this.$store.state.vanTabbar = true
   },
   watch:{
     'radio':function(){

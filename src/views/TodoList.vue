@@ -71,7 +71,7 @@ export default {
   },
   mounted(){
       this.$store.state.vanTabbar = false
-    if(localStorage.getItem('todos')!=null){
+    if(this.$ls.get('todos')!=null){
       this.getTodo();
     }
   },
@@ -87,7 +87,7 @@ export default {
       return `${yy}/${mm}/${dd}(${arr_week[date.getDay()]})`;
     },
     getTodo(){
-      this.sql = JSON.parse(localStorage.getItem('todos'));
+      this.sql = JSON.parse(this.$ls.get('todos'));
       if(this.sql){
         this.sql.map((item)=>{
             this.show=item.todolist.length>0 ? false:null;
@@ -113,11 +113,11 @@ export default {
         });
     },
     save(){
-      localStorage.setItem('todos',JSON.stringify(this.sql));
+      this.$ls.set('todos',JSON.stringify(this.sql));
     }
   },
   destroyed(){
-    this.$store.state.vanTabbar = true
+    // this.$store.state.vanTabbar = true
   },
   watch:{
   }
