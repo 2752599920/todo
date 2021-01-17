@@ -104,7 +104,7 @@ export default {
       this.save();
     },
     del(sqlIndex,i){
-      console.log(sqlIndex,i);
+      // console.log(sqlIndex,i);
       this.$dialog.confirm({
         title: '提示',
         message: '是否确认删除？',
@@ -114,7 +114,6 @@ export default {
           this.save();
           this.$toast.success('删除成功');
           this.getTodo();
-
         })
         .catch(() => {
           // this.$toast.success('取消成功');
